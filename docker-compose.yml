@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # MySQL 데이터베이스
+  mysql:
+    image: mysql:8.0
+    container_name: mail_security_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mail_security_db
+      MYSQL_USER: mail_user
+      MYSQL_PASSWORD: mail_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      - mail_security_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI 백엔드
+  fastapi:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mail_security_fastapi
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=mysql+pymysql://mail_user:mail_password@mysql:3306/mail_security_db
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=mail_security_db
+      - MYSQL_USER=mail_user
+      - MYSQL_PASSWORD=mail_password
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - /app/__pycache__
+    networks:
+      - mail_security_network
+    depends_on:
+      mysql:
+        condition: service_healthy
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  # React 프론트엔드
+  react:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: mail_security_react
+    restart: unless-stopped
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - mail_security_network
+    depends_on:
+      - fastapi
+    stdin_open: true
+    tty: true
+
+networks:
+  mail_security_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
+
