@@ -38,8 +38,8 @@ services:
       - DB_URL=mysql+pymysql://mail_user:mail_password@mysql:3306/mail_security_db
       
       # [네이버 SMTP 설정]
-      - MAIL_USERNAME=yeoseoin@naver.com   # 아이디 적용 완료
-      - MAIL_PASSWORD=5KYNZ1HJJV8X         # 앱 비밀번호 적용 완료
+      - MAIL_USERNAME=   # 아이디 적용 완료
+      - MAIL_PASSWORD=   # 앱 비밀번호 적용 완료
       - MAIL_FROM=yeoseoin@naver.com       # 보내는 사람 적용 완료
       - MAIL_PORT=587
       - MAIL_SERVER=smtp.naver.com
