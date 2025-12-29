@@ -24,7 +24,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # FastAPI (네이버 계정 적용 완료 ✅)
+  # FastAPI
   fastapi:
     build:
       context: ./backend
@@ -34,15 +34,10 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+    env_file:
+      - .env
     environment:
       - DB_URL=mysql+pymysql://mail_user:mail_password@mysql:3306/mail_security_db
-      
-      # [네이버 SMTP 설정]
-      - MAIL_USERNAME=   # 아이디 적용 완료
-      - MAIL_PASSWORD=   # 앱 비밀번호 적용 완료
-      - MAIL_FROM=yeoseoin@naver.com       # 보내는 사람 적용 완료
-      - MAIL_PORT=587
-      - MAIL_SERVER=smtp.naver.com
 
     ports:
       - "8000:8000"
