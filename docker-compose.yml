@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # MySQL 데이터베이스
+  # MySQL (변경 없음)
   mysql:
     image: mysql:8.0
     container_name: mail_security_mysql
@@ -24,20 +24,26 @@ services:
       timeout: 5s
       retries: 5
 
-  # FastAPI 백엔드
+  # FastAPI (네이버 계정 적용 완료 ✅)
   fastapi:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: mail_security_fastapi
     restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
     environment:
-      - DATABASE_URL=mysql+pymysql://mail_user:mail_password@mysql:3306/mail_security_db
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT=3306
-      - MYSQL_DATABASE=mail_security_db
-      - MYSQL_USER=mail_user
-      - MYSQL_PASSWORD=mail_password
+      - DB_URL=mysql+pymysql://mail_user:mail_password@mysql:3306/mail_security_db
+      
+      # [네이버 SMTP 설정]
+      - MAIL_USERNAME=yeoseoin@naver.com   # 아이디 적용 완료
+      - MAIL_PASSWORD=5KYNZ1HJJV8X         # 앱 비밀번호 적용 완료
+      - MAIL_FROM=yeoseoin@naver.com       # 보내는 사람 적용 완료
+      - MAIL_PORT=587
+      - MAIL_SERVER=smtp.naver.com
+
     ports:
       - "8000:8000"
     volumes:
@@ -45,12 +51,9 @@ services:
       - /app/__pycache__
     networks:
       - mail_security_network
-    depends_on:
-      mysql:
-        condition: service_healthy
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
-  # React 프론트엔드
+  # React (변경 없음)
   react:
     build:
       context: ./frontend
@@ -78,4 +81,3 @@ networks:
 volumes:
   mysql_data:
     driver: local
-
