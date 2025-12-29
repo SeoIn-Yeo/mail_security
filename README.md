@@ -40,6 +40,7 @@ BE: Jinja2 템플릿 엔진을 사용하여 수신자 이름 등을 동적으로
 [] 3. 메일 오픈 추적 (Open Tracking)
 
 기능: 수신자가 메일을 열었는지 확인
+
 구현 전략: Tracking Pixel 방식 사용
 메일 본문에 1x1 투명 이미지를 img src="http://server-api/track/open?id=unique_id" 형태로 삽입
 이미지가 로드될 때 서버가 요청을 받아 해당 ID의 '읽음 상태'를 DB에 업데이트
@@ -47,6 +48,7 @@ BE: Jinja2 템플릿 엔진을 사용하여 수신자 이름 등을 동적으로
 [] 4. 링크/버튼 클릭 추적 (Click Tracking)
 
 기능: 본문 내 버튼 클릭 시 감지
+
 구현 전략: Redirect 방식 사용
 메일 내 버튼 링크를 최종 목적지가 아닌 http://server-api/track/click?id=unique_id&target=final_url로 설정
 서버는 클릭 로그를 DB에 저장한 후 사용자를 실제 목적지(target)로 리다이렉트
